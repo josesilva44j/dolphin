@@ -1,0 +1,35 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - name: Baixar o codigo (com submodulos)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Instalar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Aceitar licencas do Android SDK
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+
+      - name: Compilar APK (debug, so arm64)
+        working-directory: Source/Android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug -Pandroid.injected.build.abi=arm64-v8a --no-daemon
+
+      - name: Guardar o APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: dolphin-mali-apk
+          path: Source/Android/app/build/outputs/apk/debug/*.apk
