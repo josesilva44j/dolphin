@@ -26,10 +26,19 @@ jobs:
         working-directory: Source/Android
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug -Pandroid.injected.build.abi=arm64-v8a --no-daemon
+          ./gradlew :app:assembleDebug -Pandroid.injected.build.abi=arm64-v8a --no-daemon --console=plain
+
+      - name: Procurar onde o APK foi parar
+        if: always()
+        run: |
+          echo "=== APKs encontrados ==="
+          find . -name "*.apk" -not -path "*/node_modules/*" | head -50
+          echo "=== Conteudo de outputs ==="
+          ls -R Source/Android/app/build/outputs 2>/dev/null | head -80
 
       - name: Guardar o APK
         uses: actions/upload-artifact@v4
         with:
           name: dolphin-mali-apk
-          path: Source/Android/app/build/outputs/apk/debug/*.apk
+          path: Source/Android/**/build/outputs/apk/**/*.apk
+          if-no-files-found: error
