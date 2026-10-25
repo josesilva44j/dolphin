@@ -40,5 +40,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dolphin-mali-apk
-          path: Source/Android/**/build/outputs/apk/**/*.apk
+          path: Source/Android/app/build/intermediates/apk/debug/app-debug.apk
           if-no-files-found: error
